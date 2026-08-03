@@ -1,0 +1,98 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { LANGS, UI, getPosts, formatDate, type Lang } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  return LANGS.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const t = UI[lang];
+const posts = await getPosts(lang);
+---
+
+<BaseLayout lang={lang} title={`${t.siteTitle} — ${t.tagline}`} description={t.tagline}>
+  <h1>{t.tagline}</h1>
+
+  {
+    posts.length === 0 ? (
+      <p class="empty">{t.noPosts}</p>
+    ) : (
+      <ul class="post-list">
+        {posts.map(({ entry, pairKey }) => (
+          <li>
+            <a href={`/${lang}/posts/${pairKey}/`}>
+              <h2>
+                {entry.data.draft && <span class="draft">{t.draftBadge}</span>}
+                {entry.data.title}
+              </h2>
+            </a>
+            <p class="desc">{entry.data.description}</p>
+            <p class="meta">
+              <time datetime={entry.data.pubDate.toISOString()}>
+                {formatDate(entry.data.pubDate, lang)}
+              </time>
+            </p>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</BaseLayout>
+
+<style>
+  h1 {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--muted);
+    margin-block: 0 2.5rem;
+  }
+
+  .post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .post-list a {
+    text-decoration: none;
+  }
+
+  .post-list h2 {
+    font-size: 1.25rem;
+    margin: 0 0 0.35rem;
+  }
+
+  .post-list a:hover h2 {
+    color: var(--accent);
+  }
+
+  .draft {
+    display: inline-block;
+    margin-right: 0.5rem;
+    padding: 0.05rem 0.45rem;
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    color: var(--accent);
+    font-size: 0.7rem;
+    font-weight: 600;
+    vertical-align: middle;
+  }
+
+  .desc {
+    margin: 0;
+    color: var(--fg);
+  }
+
+  .meta {
+    margin: 0.35rem 0 0;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  .empty {
+    color: var(--muted);
+  }
+</style>

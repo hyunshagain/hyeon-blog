@@ -1,0 +1,191 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { UI, formatDate, type Lang, type PostRef } from '../lib/posts';
+
+interface Props {
+  post: PostRef;
+  translation: PostRef | null;
+}
+
+const { post, translation } = Astro.props;
+const { entry, lang } = post;
+const { data } = entry;
+const t = UI[lang as Lang];
+
+const altLangHref = translation
+  ? `/${translation.lang}/posts/${translation.pairKey}/`
+  : undefined;
+---
+
+<BaseLayout
+  lang={lang}
+  title={`${data.title} — ${t.siteTitle}`}
+  description={data.description}
+  altLangHref={altLangHref}
+>
+  <article>
+    <header class="post-head">
+      {data.draft && <p class="draft">{t.draftBadge}</p>}
+      <h1>{data.title}</h1>
+      <p class="meta">
+        <time datetime={data.pubDate.toISOString()}>
+          {t.published} {formatDate(data.pubDate, lang)}
+        </time>
+        {
+          data.updatedDate && (
+            <>
+              {' · '}
+              <time datetime={data.updatedDate.toISOString()}>
+                {t.updated} {formatDate(data.updatedDate, lang)}
+              </time>
+            </>
+          )
+        }
+      </p>
+      {
+        data.tags.length > 0 && (
+          <ul class="tags">
+            {data.tags.map((tag) => (
+              <li>#{tag}</li>
+            ))}
+          </ul>
+        )
+      }
+    </header>
+
+    <div class="prose">
+      <slot />
+    </div>
+
+    <section class="evidence" aria-labelledby="evidence-heading">
+      <h2 id="evidence-heading">{t.evidence}</h2>
+      <ul>
+        {
+          data.evidence.map((item) => (
+            <li>
+              <span class="etype">{item.type}</span>
+              <code>{item.ref}</code>
+              <span class="enote">{item.note}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="sources" aria-labelledby="sources-heading">
+      <h2 id="sources-heading">{t.sources}</h2>
+      <ol>
+        {
+          data.sources.map((url) => (
+            <li>
+              <a href={url} rel="noopener noreferrer nofollow" target="_blank">
+                {url}
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <p class="back"><a href={`/${lang}/`}>{t.backToList}</a></p>
+  </article>
+</BaseLayout>
+
+<style>
+  .post-head {
+    padding-block: 1rem 0.5rem;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 2rem;
+  }
+
+  .draft {
+    display: inline-block;
+    margin: 0 0 0.5rem;
+    padding: 0.1rem 0.5rem;
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .meta {
+    color: var(--muted);
+    font-size: 0.875rem;
+    margin: 0.25rem 0 0;
+  }
+
+  .tags {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0;
+    margin: 0.75rem 0 0;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .evidence,
+  .sources {
+    margin-top: 3rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.9rem;
+  }
+
+  .evidence :global(h2),
+  .sources :global(h2) {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-block: 1.25rem 0.75rem;
+  }
+
+  .evidence ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .evidence li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.35rem 0.6rem;
+    align-items: baseline;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.7rem 0.85rem;
+  }
+
+  .etype {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+  }
+
+  .enote {
+    grid-column: 1 / -1;
+    color: var(--muted);
+  }
+
+  .sources ol {
+    padding-left: 1.2rem;
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .sources a {
+    color: var(--muted);
+  }
+
+  .back {
+    margin-top: 3rem;
+    font-size: 0.9rem;
+  }
+</style>

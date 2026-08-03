@@ -1,0 +1,36 @@
+{
+  "_comment": "LLM 초안에서 반복적으로 나오는 표현. 발견되면 발행이 차단된다. 자유롭게 추가/삭제할 것 — 이 목록이 곧 '내 문체'의 정의다.",
+  "ko": [
+    "알아보겠습니다",
+    "알아보도록 하겠습니다",
+    "살펴보도록 하겠습니다",
+    "오늘날 급변하는",
+    "빠르게 변화하는 현대",
+    "바쁜 현대인",
+    "결론적으로 말하자면",
+    "지금까지 살펴본 바와 같이",
+    "없어서는 안 될",
+    "중요한 요소 중 하나입니다",
+    "많은 도움이 되었으면 좋겠습니다",
+    "다양한 측면에서",
+    "핵심 키워드",
+    "이는 매우 중요합니다",
+    "무엇보다 중요한 것은"
+  ],
+  "en": [
+    "in today's fast-paced",
+    "delve into",
+    "it is important to note that",
+    "in conclusion,",
+    "unlock the power of",
+    "game-changer",
+    "rich tapestry",
+    "navigate the complexities",
+    "at the end of the day,",
+    "when it comes to",
+    "a testament to",
+    "leverage the power",
+    "ever-evolving landscape",
+    "let's dive in"
+  ]
+}

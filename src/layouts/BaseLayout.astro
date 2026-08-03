@@ -1,0 +1,235 @@
+---
+import { UI, type Lang } from '../lib/posts';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  /** 언어 전환 링크의 목적지. 대응 판본이 없으면 해당 언어 홈으로 보낸다. */
+  altLangHref?: string;
+}
+
+const { lang, title, description, altLangHref } = Astro.props;
+const t = UI[lang];
+const other: Lang = lang === 'ko' ? 'en' : 'ko';
+const switchHref = altLangHref ?? `/${other}/`;
+---
+
+<!doctype html>
+<html lang={lang === 'ko' ? 'ko-KR' : 'en'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={`${UI[lang].siteTitle} — RSS`}
+      href={new URL(`/${lang}/rss.xml`, Astro.site)}
+    />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+  </head>
+  <body>
+    <a class="skip" href="#main">본문으로 건너뛰기</a>
+
+    <header class="site-header">
+      <a class="brand" href={`/${lang}/`}>{t.siteTitle}</a>
+      <nav>
+        <a href={switchHref} hreflang={other}>{t.otherLang}</a>
+        <a href={`/${lang}/rss.xml`}>RSS</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <p>{t.siteTitle} · {new Date().getFullYear()}</p>
+    </footer>
+
+    <style is:global>
+      :root {
+        --bg: #fdfdfc;
+        --fg: #1b1b19;
+        --muted: #6a6a63;
+        --line: #e2e2dc;
+        --accent: #9c4221;
+        --card: #f6f6f2;
+        --measure: 42rem;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #16161a;
+          --fg: #e8e8e3;
+          --muted: #9a9a93;
+          --line: #2e2e35;
+          --accent: #e8926b;
+          --card: #1e1e24;
+        }
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font-family:
+          'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Segoe UI',
+          'Noto Sans KR', sans-serif;
+        font-size: 17px;
+        line-height: 1.75;
+        /* 한글은 어절 단위로 끊어야 읽힌다. */
+        word-break: keep-all;
+        overflow-wrap: anywhere;
+      }
+
+      .skip {
+        position: absolute;
+        left: -9999px;
+      }
+      .skip:focus {
+        left: 1rem;
+        top: 1rem;
+        z-index: 10;
+        background: var(--accent);
+        color: #fff;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+      }
+
+      .site-header,
+      .site-footer,
+      main {
+        max-width: var(--measure);
+        margin-inline: auto;
+        padding-inline: 1.25rem;
+      }
+
+      .site-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 1rem;
+        padding-block: 2rem 1.25rem;
+        flex-wrap: wrap;
+      }
+
+      .brand {
+        font-weight: 700;
+        font-size: 1.05rem;
+        letter-spacing: -0.01em;
+      }
+
+      .site-header nav {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.9rem;
+      }
+
+      a {
+        color: inherit;
+        text-decoration-color: var(--line);
+        text-underline-offset: 0.2em;
+      }
+      a:hover {
+        text-decoration-color: var(--accent);
+      }
+
+      main {
+        padding-block: 1rem 4rem;
+      }
+
+      h1,
+      h2,
+      h3 {
+        line-height: 1.35;
+        letter-spacing: -0.015em;
+      }
+      h1 {
+        font-size: 1.9rem;
+        margin-block: 0 0.5rem;
+      }
+      h2 {
+        font-size: 1.3rem;
+        margin-block: 2.5rem 0.75rem;
+      }
+      h3 {
+        font-size: 1.1rem;
+        margin-block: 2rem 0.5rem;
+      }
+
+      .site-footer {
+        border-top: 1px solid var(--line);
+        padding-block: 1.5rem 3rem;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      img,
+      video {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+      }
+
+      pre {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 1rem;
+        overflow-x: auto;
+        font-size: 0.875rem;
+        line-height: 1.6;
+      }
+
+      :not(pre) > code {
+        background: var(--card);
+        border-radius: 4px;
+        padding: 0.1em 0.35em;
+        font-size: 0.9em;
+      }
+
+      blockquote {
+        margin-inline: 0;
+        padding-left: 1rem;
+        border-left: 3px solid var(--line);
+        color: var(--muted);
+      }
+
+      /* 넓은 표는 페이지가 아니라 자기 자신이 가로 스크롤한다. */
+      .table-scroll {
+        overflow-x: auto;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 0.925rem;
+      }
+      th,
+      td {
+        border: 1px solid var(--line);
+        padding: 0.5rem 0.7rem;
+        text-align: left;
+      }
+      th {
+        background: var(--card);
+      }
+    </style>
+  </body>
+</html>
